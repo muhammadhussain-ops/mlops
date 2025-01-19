@@ -1,5 +1,3 @@
-"""2. <h1>ANN<h1>"""
-
 import os
 import torch
 from torch import nn
