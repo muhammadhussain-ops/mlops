@@ -105,7 +105,7 @@ curl -X POST http://localhost:5000/train
 
 curl -X GET http://localhost:5000/evaluate
 
-curl -X POST http://localhost:5000/inference -H "Content-Type: application/json" -d '{"input": "some_input_data"}'
+curl -X POST http://localhost:5000/inference -H "Content-Type: application/json" -d '{"input": [[[[0.1, 0.2, ...]]]]}'
 
 
 """
