@@ -4,25 +4,38 @@ from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handl
 from src.mlops.train import train
 from src.mlops.evaluate import evaluate
 from google.cloud import storage
+from torch.utils.data import DataLoader
+from torchvision import transforms
+import torch
 
 import torch
 
 app = Flask(__name__)
 
 # Load data and model
-data =  CelebADataset(
-    bucket_name="mlops-bucket-224229-1",
-    image_folder="raw/img_align_celeba/img_align_celeba",
-    labels_path="raw/list_attr_celeba.csv",
-    transform=None
-)
+# DataLoader setup
+def create_data_loader():
+    transform = transforms.Compose([
+        transforms.Resize((128, 128)),  # Example resizing
+        transforms.ToTensor(),
+    ])
+
+    dataset = CelebADataset(
+        bucket_name="mlops-bucket-224229-1",
+        image_folder="raw/img_align_celeba/img_align_celeba",
+        labels_path="raw/list_attr_celeba.csv",
+        transform=transform
+    )
+    return DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
+
+train_loader = create_data_loader()
 model = NeuralNetwork()
 # load_model_weights(model)  # Loads weights into the model using the function from model.py
 
 @app.route("/train", methods=["POST"])
 def train_model():
-    global model, data
-    train(model, data)  # Train the model with the data
+    global model, train_loader
+    train(model, train_loader)  # Train the model with the data
     local_model_path = "model_weights.pth"
     torch.save(model.state_dict(), local_model_path)
 
@@ -36,7 +49,7 @@ def train_model():
 
 @app.route("/evaluate", methods=["GET"])
 def evaluate_model():
-    global model, data
+    global model, train_loader
     
     # Hent vægte fra GCS
     local_model_path = "model_weights.pth"
@@ -49,7 +62,7 @@ def evaluate_model():
     blob.download_to_filename(local_model_path)
     model.load_state_dict(torch.load(local_model_path))
 
-    results = evaluate(model, data)
+    results = evaluate(model, train_loader)
     return jsonify({"status": "success", "results": results})
 
 @app.route("/inference", methods=["POST"])
