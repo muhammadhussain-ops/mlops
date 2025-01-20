@@ -1,10 +1,15 @@
 import os
+from io import BytesIO
 from PIL import Image
 import torch
-from torch.utils.data import Dataset
-from io import BytesIO
-from google.cloud import storage
 import pandas as pd
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+from google.cloud import storage
+import google.api_core.exceptions
+from torchvision import transforms
+
+
 
 class CelebADataset(Dataset):
     def __init__(self, bucket_name, image_folder, labels_path, transform=None):
@@ -44,3 +49,16 @@ class CelebADataset(Dataset):
         labels = torch.tensor(labels, dtype=torch.float32)
         return image, labels
 
+def create_train_loader():
+    transform = transforms.Compose([
+        transforms.Resize((128, 128)),  # Example resizing
+        transforms.ToTensor(),
+    ])
+
+    dataset = CelebADataset(
+        bucket_name="mlops-bucket-224229-1",
+        image_folder="raw/img_align_celeba/img_align_celeba",
+        labels_path="raw/list_attr_celeba.csv",
+        transform=transform
+    )
+    return DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)

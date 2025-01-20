@@ -1,32 +1,38 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlops"
-version = "0.0.1"
-description = "A short description of the project."
+version = "0.1.0"
+description = "Proof of concept for MLops pipeline using a simple image classifier."
 authors = [
-  { name = "dtu", email = "your@email.com" },
+  { name = John Hansen, email = "jwhansen1996@gmail.com" },
 ]
 
-keywords = ["machine learning", "MLOps"]
+keywords = ["machine learning", "MLOps", "image classification"]
 classifiers = [
   "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 readme = "README.md"
-requires-python = ">=3.11"
-dynamic = ["dependencies", "optional-dependencies"]
+requires-python = ">=3.10.9"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-
-[tool.setuptools.dynamic.optional-dependencies]
-dev = {file = ['requirements_dev.txt']}
-
-[tool.ruff]
-line-length = 120
+optional-dependencies = {dev = {file = ["requirements_dev.txt"]}}
 
 [tool.coverage.run]
-omit = ["tests/*"]
+branch = true
+omit = [
+  "tests/*",
+  "examples/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
