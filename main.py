@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from src.mlops.data import CelebADataset  # Assuming 'download_data' handles data downloading
-from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
-from src.mlops.train import train
-from src.mlops.evaluate import *
+from model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
+from train import train
+from evaluate import evaluate, accuracy
 from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
