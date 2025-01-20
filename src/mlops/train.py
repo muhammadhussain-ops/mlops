@@ -1,7 +1,7 @@
 import torch
 from evaluate import accuracy
 
-def train(model, train_loader, criterion, optimizer, epoch):
+def train(model, train_loader, criterion = torch.nn.CrossEntropyLoss(), optimizer = torch.optim.Adam(torch.model.parameters(), lr=0.001), epoch=1):
     model.train()
     running_loss = 0.0
     running_acc = 0.0
