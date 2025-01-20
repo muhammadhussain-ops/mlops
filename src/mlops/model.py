@@ -1,8 +1,7 @@
-import torch
 from torch import nn
 
 class NeuralNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self, pretrained_weights=None):
         super(NeuralNetwork, self).__init__()
         self.conv_stack = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
@@ -12,6 +11,7 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
+        
         self.flatten = nn.Flatten()
         self.fc_stack = nn.Sequential(
             nn.Linear(64 * 54 * 44, 128),
