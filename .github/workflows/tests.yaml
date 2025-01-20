@@ -33,4 +33,5 @@ jobs:
           pip install -r requirements.txt
           pip list
       - name: Run tests
-        run: ls
+        run: python tests/test_data.py
+
