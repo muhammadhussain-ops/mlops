@@ -82,3 +82,15 @@ def run_inference():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+"""
+ekmsempler på api kald:
+
+curl -X POST http://localhost:5000/train
+
+curl -X GET http://localhost:5000/evaluate
+
+curl -X POST http://localhost:5000/inference -H "Content-Type: application/json" -d '{"input": "some_input_data"}'
+
+
+"""
