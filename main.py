@@ -3,6 +3,7 @@ from src.mlops.data import CelebADataset  # Assuming 'download_data' handles dat
 from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
 from src.mlops.train import train
 from src.mlops.evaluate import evaluate
+from google.cloud import storage
 
 import torch
 
@@ -22,12 +23,33 @@ model = NeuralNetwork()
 def train_model():
     global model, data
     train(model, data)  # Train the model with the data
+    local_model_path = "model_weights.pth"
+    torch.save(model.state_dict(), local_model_path)
+
+    client = storage.Client()
+    bucket = client.bucket("mlops-bucket-224229-1")
+    blob = bucket.blob("models/model_weights.pth")
+    blob.upload_from_filename(local_model_path)
+
+
     return jsonify({"status": "success", "message": "Model training complete."})
 
 @app.route("/evaluate", methods=["GET"])
 def evaluate_model():
     global model, data
-    results = evaluate(model, data)  # Evaluate the model
+    
+    # Hent vægte fra GCS
+    local_model_path = "model_weights.pth"
+    bucket_name = "mlops-bucket-224229-1"
+    model_path = "models/model_weights.pth"
+
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(model_path)
+    blob.download_to_filename(local_model_path)
+    model.load_state_dict(torch.load(local_model_path))
+
+    results = evaluate(model, data)
     return jsonify({"status": "success", "results": results})
 
 @app.route("/inference", methods=["POST"])
