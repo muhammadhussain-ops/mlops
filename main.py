@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from src.mlops.data import CelebADataset  # Assuming 'download_data' handles data downloading
 from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
 from src.mlops.train import train
-from src.mlops.evaluate import evaluate
+from src.mlops.evaluate import *
 from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -62,8 +62,14 @@ def evaluate_model():
     blob.download_to_filename(local_model_path)
     model.load_state_dict(torch.load(local_model_path))
 
-    results = evaluate(model, train_loader)
-    return jsonify({"status": "success", "results": results})
+    criterion = torch.nn.CrossEntropyLoss()
+    avg_loss, avg_acc = evaluate(model, train_loader, criterion)
+    return jsonify({
+        "status": "success",
+        "test_loss": avg_loss,
+        "test_accuracy": avg_acc
+    })
+
 
 @app.route("/inference", methods=["POST"])
 def run_inference():

@@ -16,4 +16,7 @@ def evaluate(model, test_loader, criterion):
             loss = criterion(outputs, labels)
             test_loss += loss.item()
             test_acc += accuracy(outputs, labels)
-    print(f"Test Loss: {test_loss / len(test_loader):.4f}, Test Accuracy: {test_acc / len(test_loader):.4f}")
+    avg_loss = test_loss / len(test_loader)
+    avg_acc = test_acc / len(test_loader)
+    print(f"Test Loss: {avg_loss:.4f}, Test Accuracy: {avg_acc:.4f}")
+    return avg_loss, avg_acc
