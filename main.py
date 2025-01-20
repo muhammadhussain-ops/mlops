@@ -77,8 +77,23 @@ def run_inference():
     if input_data is None:
         return jsonify({"status": "error", "message": "Input data is missing."}), 400
     
-    result = model.infer(input_data)  # Sørg for at tilføje infer-metoden til din model
-    return jsonify({"status": "success", "result": result})
+    try:
+        # Konverter input_data til en tensor
+        import torch
+        input_tensor = torch.tensor(input_data).unsqueeze(0)  # Tilføj batch-dimension
+
+        # Sæt modellen i eval-mode og udfør inferens
+        model.eval()
+        with torch.no_grad():
+            result = model(input_tensor)
+
+        # Konverter resultatet til en JSON-kompatibel struktur
+        result_list = result.tolist()
+        return jsonify({"status": "success", "result": result_list})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
