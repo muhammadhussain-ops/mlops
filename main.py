@@ -90,14 +90,17 @@ async def evaluate_model():
 async def run_inference(data: InferenceInput):
     global model
     try:
-        input_tensor = torch.tensor(data.input).unsqueeze(0)  # Add batch dimension
+        # Konverter JSON til tensor og valider dimensioner
+        input_tensor = torch.tensor(data.input, dtype=torch.float32)
+        if input_tensor.dim() != 4 or input_tensor.shape[1:] != (3, 128, 128):
+            raise ValueError(f"Invalid input dimensions: {input_tensor.shape}, expected (batch_size, 3, 128, 128)")
 
+        # Kør inferens
         model.eval()
         with torch.no_grad():
             result = model(input_tensor)
 
-        result_list = result.tolist()
-        return {"status": "success", "result": result_list}
+        return {"status": "success", "result": result.tolist()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during inference: {str(e)}")
 
