@@ -87,15 +87,22 @@ async def evaluate_model():
         raise HTTPException(status_code=500, detail=f"Error during evaluation: {str(e)}")
 
 @app.post("/inference")
-async def run_inference(data: InferenceInput):
+async def run_inference(data: dict):
     global model
     try:
-        # Konverter JSON til tensor og valider dimensioner
-        input_tensor = torch.tensor(data.input, dtype=torch.float32)
-        if input_tensor.dim() != 4 or input_tensor.shape[1:] != (3, 128, 128):
+        # Ekstrakter input direkte fra JSON
+        input_data = data.get("input")
+        if not input_data:
+            raise ValueError("Input is required and cannot be empty")
+
+        # Konverter til tensor
+        input_tensor = torch.tensor(input_data, dtype=torch.float32)
+
+        # Valider dimensioner
+        if input_tensor.dim() != 4 or input_tensor.shape[1:] != (3, 128, 128):  # Tilpas dimensioner
             raise ValueError(f"Invalid input dimensions: {input_tensor.shape}, expected (batch_size, 3, 128, 128)")
 
-        # Kør inferens
+        # Inferens
         model.eval()
         with torch.no_grad():
             result = model(input_tensor)
