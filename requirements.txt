@@ -10,3 +10,4 @@ torchvision==0.20.1
 google-cloud
 google-cloud-storage
 omegaconf
+tqdm
