@@ -4,6 +4,7 @@ from data import create_train_loader
 from model import NeuralNetwork
 from google.cloud import storage
 from torchvision import transforms
+from omegaconf import OmegaConf
 
 def save_weights(model, bucket_name, destination_blob_name):
     """
@@ -48,12 +49,12 @@ def train(model, train_loader, criterion, optimizer, num_epochs=5):
                 running_acc = 0.0
             
 
-# Load the data
+# Load the data, model, and hyperparameters
+config = OmegaConf.load('configs/train_config.yaml')
 train_loader = create_train_loader()
 model = NeuralNetwork()
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-num_epochs = 1
-train(model, train_loader, criterion, optimizer, num_epochs)
+optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
+train(model, train_loader, criterion, optimizer, num_epochs = config.num_epochs)
 save_weights(model, "mlops-bucket-224229-1", "models/model.pth")
 

@@ -1,9 +1,19 @@
 Flask==3.1.0
 invoke==2.2.0
 matplotlib==3.8.3
+<<<<<<< Updated upstream
 numpy
+=======
+numpy>=1.21.0,<2.0.0
+>>>>>>> Stashed changes
 pandas==2.2.3
 Pillow==11.1.0
 protobuf==5.29.3
 torch==2.5.1
 torchvision==0.20.1
+<<<<<<< Updated upstream
+=======
+google-cloud
+google-cloud-storage
+omegaconf
+>>>>>>> Stashed changes
