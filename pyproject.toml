@@ -7,7 +7,7 @@ name = "mlops"
 version = "0.1.0"
 description = "Proof of concept for MLops pipeline using a simple image classifier."
 authors = [
-  { name = John Hansen, email = "jwhansen1996@gmail.com" },
+  { name = "John Hansen", email = "jwhansen1996@gmail.com" },
 ]
 
 keywords = ["machine learning", "MLOps", "image classification"]
