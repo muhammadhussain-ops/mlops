@@ -9,9 +9,12 @@ from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import torch
+from omegaconf import Omegaconf
 
 # Initialiser FastAPI
 app = FastAPI()
+
+config = OmegaConf.load("configs/main_config")
 
 # DataLoader setup
 def create_data_loader():
@@ -40,18 +43,29 @@ class InferenceInput(BaseModel):
 async def train_model():
     global model, train_loader
     try:
-        train(model, train_loader)  # Train the model with the data
-        local_model_path = "model_weights.pth"
+        # Load configuration
+        config = load_config()
+
+        # Define criterion and optimizer
+        criterion = torch.nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(model.parameters(), lr=config.hyperparameters.lr)
+
+        # Call train function
+        train(model, train_loader, criterion, optimizer, num_epochs=config.hyperparameters.num_epochs)
+
+        # Save model weights to Google Cloud Storage
+        local_model_path = "trained_model.pth"
         torch.save(model.state_dict(), local_model_path)
 
         client = storage.Client()
         bucket = client.bucket("mlops-bucket-224229-1")
-        blob = bucket.blob("models/model_weights.pth")
+        blob = bucket.blob("models/model.pth")
         blob.upload_from_filename(local_model_path)
 
         return {"status": "success", "message": "Model training complete."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during training: {str(e)}")
+
 
 @app.get("/evaluate")
 async def evaluate_model():
