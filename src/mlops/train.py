@@ -47,7 +47,7 @@ def train(model, train_loader, criterion, optimizer, num_epochs=5):
 
             # Update tqdm description with current loss and accuracy
             progress_bar.set_postfix(loss=running_loss / (i + 1), accuracy=running_acc / (i + 1))
-
+"""
 # Load configuration and start training
 try:
     config = OmegaConf.load('configs/train_config.yaml')
@@ -59,3 +59,4 @@ try:
     save_weights(model, "mlops-bucket-224229-1", "models/model.pth")
 except Exception as e:
     logging.error(f"Training failed: {e}")
+    """
