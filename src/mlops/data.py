@@ -25,11 +25,10 @@ class CelebADataset(Dataset):
         self.labels_path = labels_path
         self.transform = transform
 
-        self.client = storage.Client()
-        self.bucket = self.client.bucket(bucket_name)
-
         try:
-            blob = self.bucket.blob(self.labels_path)
+            client = storage.Client()  # Create client locally
+            bucket = client.bucket(bucket_name)
+            blob = bucket.blob(self.labels_path)
             labels_data = blob.download_as_text()
             self.labels_df = pd.read_csv(BytesIO(labels_data.encode("utf-8")))
             self.labels_df = self.labels_df.replace([-1], [0])
@@ -37,7 +36,7 @@ class CelebADataset(Dataset):
         except Exception as e:
             logging.error(f"Failed to load labels: {e}")
             raise
-
+        
     def __len__(self):
         return len(self.labels_df)
 
@@ -47,7 +46,9 @@ class CelebADataset(Dataset):
         blob_path = os.path.join(self.image_folder, img_name).replace("\\", "/")
 
         try:
-            blob = self.bucket.blob(blob_path)
+            client = storage.Client()  # Create client locally
+            bucket = client.bucket(self.bucket_name)
+            blob = bucket.blob(blob_path)
             image_data = blob.download_as_bytes()
             image = Image.open(BytesIO(image_data)).convert("RGB")
         except google.api_core.exceptions.NotFound:
@@ -58,6 +59,7 @@ class CelebADataset(Dataset):
             image = self.transform(image)
         labels = torch.tensor(labels, dtype=torch.float32)
         return image, labels
+
     
 def create_train_loader(small_subset=config.hyperparameters.small_subset , subset_size=100):
     transform = transforms.Compose([
