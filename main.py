@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-from src.mlops.data import CelebADataset  # Assuming 'download_data' handles data downloading
+from src.mlops.data import create_train_loader  # Assuming 'download_data' handles data downloading
 from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
 from src.mlops.train import train, save_weights
 from src.mlops.evaluate import evaluate
@@ -21,22 +21,9 @@ try:
 except FileNotFoundError:
     raise RuntimeError("Configuration file not found. Ensure 'configs/main_config.yaml' exists.")
 
-# DataLoader setup
-def create_data_loader():
-    transform = transforms.Compose([
-        transforms.Resize((128, 128)),  # Example resizing
-        transforms.ToTensor(),
-    ])
 
-    dataset = CelebADataset(
-        bucket_name="mlops-bucket-224229-1",
-        image_folder="raw/img_align_celeba/img_align_celeba",
-        labels_path="raw/list_attr_celeba.csv",
-        transform=transform
-    )
-    return DataLoader(dataset, batch_size=config.hyperparameters.batch_size, shuffle=True, num_workers=4)
 
-train_loader = create_data_loader()
+train_loader = create_train_loader()
 model = NeuralNetwork()
 # load_model_weights(model)  # Uncomment if a pre-trained model is available
 
@@ -68,7 +55,7 @@ async def evaluate_model():
     try:
         local_model_path = "model_weights.pth"
         bucket_name = "mlops-bucket-224229-1"
-        model_path = "models/model_weights.pth"
+        model_path = "models/model.pth"
 
         client = storage.Client()
         bucket = client.bucket(bucket_name)
