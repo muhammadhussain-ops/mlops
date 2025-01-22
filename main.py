@@ -43,8 +43,6 @@ class InferenceInput(BaseModel):
 async def train_model():
     global model, train_loader
     try:
-        # Load configuration
-        config = load_config()
 
         # Define criterion and optimizer
         criterion = torch.nn.CrossEntropyLoss()
