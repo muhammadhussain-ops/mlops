@@ -61,4 +61,4 @@ def create_train_loader():
         labels_path="raw/list_attr_celeba.csv",
         transform=transform
     )
-    return DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
+    return DataLoader(dataset, batch_size=32, shuffle=True, num_workers=0)
