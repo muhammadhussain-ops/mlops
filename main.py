@@ -1,20 +1,25 @@
+### main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from src.mlops.data import CelebADataset  # Assuming 'download_data' handles data downloading
 from model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
-from train import train
-from evaluate import evaluate, accuracy
+from train import train, save_weights
+from evaluate import evaluate
 from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import torch
-from omegaconf import Omegaconf
+from omegaconf import OmegaConf
 
 # Initialiser FastAPI
 app = FastAPI()
 
-config = OmegaConf.load("configs/main_config")
+# Load configuration
+try:
+    config = OmegaConf.load("configs/main_config.yaml")
+except FileNotFoundError:
+    raise RuntimeError("Configuration file not found. Ensure 'configs/main_config.yaml' exists.")
 
 # DataLoader setup
 def create_data_loader():
@@ -29,11 +34,11 @@ def create_data_loader():
         labels_path="raw/list_attr_celeba.csv",
         transform=transform
     )
-    return DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
+    return DataLoader(dataset, batch_size=config.hyperparameters.batch_size, shuffle=True, num_workers=4)
 
 train_loader = create_data_loader()
 model = NeuralNetwork()
-# load_model_weights(model)  # Loads weights into the model using the function from model.py
+# load_model_weights(model)  # Uncomment if a pre-trained model is available
 
 # Pydantic model for inference input
 class InferenceInput(BaseModel):
@@ -43,7 +48,6 @@ class InferenceInput(BaseModel):
 async def train_model():
     global model, train_loader
     try:
-
         # Define criterion and optimizer
         criterion = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=config.hyperparameters.lr)
@@ -52,18 +56,11 @@ async def train_model():
         train(model, train_loader, criterion, optimizer, num_epochs=config.hyperparameters.num_epochs)
 
         # Save model weights to Google Cloud Storage
-        local_model_path = "trained_model.pth"
-        torch.save(model.state_dict(), local_model_path)
-
-        client = storage.Client()
-        bucket = client.bucket("mlops-bucket-224229-1")
-        blob = bucket.blob("models/model.pth")
-        blob.upload_from_filename(local_model_path)
+        save_weights(model, "mlops-bucket-224229-1", "models/model.pth")
 
         return {"status": "success", "message": "Model training complete."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during training: {str(e)}")
-
 
 @app.get("/evaluate")
 async def evaluate_model():
@@ -109,4 +106,4 @@ def health_check():
     return {"status": "running", "message": "API is working correctly."}
 
 # Sådan kører du appen:
-# uvicorn <filnavn>:app --host 0.0.0.0 --port 8000
+# uvicorn main:app --host 0.0.0.0 --port 8000
