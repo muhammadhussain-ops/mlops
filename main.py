@@ -3,9 +3,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from src.mlops.data import CelebADataset  # Assuming 'download_data' handles data downloading
-from model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
-from train import train, save_weights
-from evaluate import evaluate
+from src.mlops.model import NeuralNetwork  # Assuming 'load_model_weights' handles model weights
+from src.mlops.train import train, save_weights
+from src.mlops.evaluate import evaluate
 from google.cloud import storage
 from torch.utils.data import DataLoader
 from torchvision import transforms
