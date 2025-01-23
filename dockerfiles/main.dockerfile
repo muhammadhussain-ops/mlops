@@ -16,4 +16,13 @@ RUN pip install -r requirements.txt --no-cache-dir --verbose
 # RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 RUN pip install . --no-deps --no-cache-dir --verbose
 
-ENTRYPOINT ["python", "-u", "main.py"]
+# Expose the port for FastAPI
+EXPOSE 8000
+
+# Set default entrypoint for Python script
+ENTRYPOINT ["uvicorn"]
+
+# ENTRYPOINT ["python", "-u", "main.py"]
+
+# Command to start FastAPI and trigger training
+CMD ["main:app", "--host", "0.0.0.0", "--port", "8000", "&", "sleep", "5", "&&", "curl", "-X", "POST", "http://127.0.0.1:8000/train"]

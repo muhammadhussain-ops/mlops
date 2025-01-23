@@ -1,0 +1,7 @@
+# config_cpu.yaml
+workerPoolSpecs:
+    machineSpec:
+        machineType: n1-highmem-2
+    replicaCount: 1
+    containerSpec:
+        imageUri: gcr.io/halogen-country-447611-g0 /gs://mlops-bucket-224229-1/dockerfiles/train.dockerfile
