@@ -33,6 +33,7 @@ jobs:
           pip install -r requirements.txt
           pip list
           pip install -e .
+          which gcloud
           gcloud auth list
       - name: Run tests
         run: python tests/test_data.py
