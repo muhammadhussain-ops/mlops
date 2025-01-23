@@ -1,0 +1,15 @@
+hyperparameters:
+ lr: 0.001
+ num_epochs: 1
+ batch_size: 32
+ small_subset: True
+
+workerPoolSpecs:
+  machineSpec:
+    machineType: n1-standard-4
+  replicaCount: 1
+  containerSpec:
+    imageUri: gs://mlops-bucket-224229-1/dockerfiles/train.dockerfile
+    command:
+      - python3
+      - src/my_project/train.py

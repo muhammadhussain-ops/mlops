@@ -1,60 +1,67 @@
+### train.py
+import logging
+from tqdm import tqdm
 import torch
-from evaluate import accuracy
-from data import create_train_loader
-from model import NeuralNetwork
-from google.cloud import storage
-from torchvision import transforms
-from omegaconf import OmegaConf
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def save_weights(model, bucket_name, destination_blob_name):
-    """
-    Save the PyTorch model's weights to a GCS bucket.
-
-    Args:
-        model: The PyTorch model to save.
-        bucket_name: Name of the GCS bucket.
-        destination_blob_name: Path in the bucket to save the model file.
-    """
-    # Save the model locally
+    logging.info("Saving model weights...")
     local_file = "trained_model.pth"
     torch.save(model.state_dict(), local_file)
 
-    # Initialize GCS client and upload the file
+    from google.cloud import storage
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
-    # Upload the model file
-    blob.upload_from_filename(local_file)
-    print(f"Model saved to GCS at: gs://{bucket_name}/{destination_blob_name}")
+    try:
+        blob.upload_from_filename(local_file)
+        logging.info(f"Model saved to GCS at: gs://{bucket_name}/{destination_blob_name}")
+    except Exception as e:
+        logging.error(f"Failed to save model: {e}")
 
 
 def train(model, train_loader, criterion, optimizer, num_epochs=5):
-    
+    logging.info("Starting training...")
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
         running_acc = 0.0
-        for i, (inputs, labels) in enumerate(train_loader):
+
+        # Wrap the loader with tqdm for a progress bar
+        progress_bar = tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch {epoch + 1}/{num_epochs}")
+
+        for i, (inputs, labels) in progress_bar:
             optimizer.zero_grad()
+            
+            labels = labels.argmax(dim=1)
+            
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-            running_acc += accuracy(outputs, labels)
-            if (i + 1) % 200 == 0:
-                print(f"Epoch {epoch}, Batch {i + 1}, Loss: {running_loss / 200:.4f}, Accuracy: {running_acc / 200:.4f}")
-                running_loss = 0.0
-                running_acc = 0.0
+            running_acc += (outputs.argmax(dim=1) == labels).float().mean().item()
+
+            # Update tqdm description with current loss and accuracy
+            progress_bar.set_postfix(loss=running_loss / (i + 1), accuracy=running_acc / (i + 1))
             
 
-# Load the data, model, and hyperparameters
-config = OmegaConf.load('configs/train_config.yaml')
-train_loader = create_train_loader()
-model = NeuralNetwork()
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
-train(model, train_loader, criterion, optimizer, num_epochs = config.num_epochs)
-save_weights(model, "mlops-bucket-224229-1", "models/model.pth")
+
+### For testing the training script locally
+# Load configuration and start training
+
+# from omegaconf import OmegaConf
+# from data import create_train_loader
+# from model import NeuralNetwork
+
+# config = OmegaConf.load('configs/train_config.yaml')
+# train_loader = create_train_loader()
+# model = NeuralNetwork()
+# criterion = torch.nn.CrossEntropyLoss()
+# optimizer = torch.optim.Adam(model.parameters(), lr=config.hyperparameters.lr)
+# train(model, train_loader, criterion, optimizer, num_epochs=config.hyperparameters.num_epochs)
+# save_weights(model, "mlops-bucket-224229-1", "models/model.pth")
 
