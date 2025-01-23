@@ -6,4 +6,4 @@ def test_my_dataset():
     data = create_train_loader()
     print(data)
     
-    
+test_my_dataset()
