@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from src.mlops.data import create_train_loader
+from mlops.data import create_train_loader
 
 def test_my_dataset():
     """Test the MyDataset class."""
