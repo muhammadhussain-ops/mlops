@@ -3,5 +3,7 @@ from mlops import data
 
 def test_my_dataset():
     """Test the MyDataset class."""
-    #dataset = MyDataset("data/raw")
-    #assert isinstance(dataset, Dataset)
+    data = create_train_loader()
+    print(data)
+    
+    
