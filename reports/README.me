@@ -606,7 +606,16 @@ interacting with the project. Ideally, the front-end application would have been
 >
 > Answer:
 
---- question 29 fill here ---
+![SS of our pipeline](figures/q29.jpeg)
+
+Our pipeline operates as follows. A local machine connected to the internet sends a prompt to our cloud-based project. 
+The project then uses Docker to set up a temporary virtual machine that acts as an operating system environment. 
+This virtual machine makes an API call to our main application file. Depending on the type of request received from the 
+local machine, the main file executes the corresponding tasks by accessing the necessary project files. After processing, 
+the system returns a value to the local machine based on the original request. This workflow ensures that computationally 
+intensive tasks are handled in the cloud, optimizing performance and resource utilization on the local machine. 
+By leveraging Docker for managing virtual environments and using API-driven interactions, our pipeline maintains consistency, 
+scalability, and efficient communication between local and cloud components.
 
 ### Question 30
 
