@@ -11,3 +11,5 @@ google-cloud
 google-cloud-storage
 omegaconf
 tqdm
+uvicorn
+fastapi

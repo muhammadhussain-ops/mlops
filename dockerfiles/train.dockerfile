@@ -12,8 +12,8 @@ COPY requirements_dev.txt requirements_dev.txt
 COPY README.md README.md
 COPY pyproject.toml pyproject.toml
 
-# RUN pip install -r requirements.txt --no-cache-dir --verbose
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir --verbose
+# RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 RUN pip install . --no-deps --no-cache-dir --verbose
 
 ENTRYPOINT ["python", "-u", "src/mlops/train.py"]

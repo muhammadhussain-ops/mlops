@@ -1,15 +1,21 @@
-hyperparameters:
- lr: 0.001
- num_epochs: 1
- batch_size: 32
- small_subset: True
-
 workerPoolSpecs:
   machineSpec:
     machineType: n1-standard-4
   replicaCount: 1
   containerSpec:
-    imageUri: gs://mlops-bucket-224229-1/dockerfiles/train.dockerfile
+    imageUri: europe-west1-docker.pkg.dev/halogen-country-447611-g0/ml-repo-224229/mlops-vertex-image
     command:
-      - python3
-      - src/my_project/train.py
+      - /bin/bash
+      - -c
+      - |
+        uvicorn main:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &
+        echo "Waiting for server to start..."
+        for i in {1..15}; do
+          if curl -s http://127.0.0.1:8000/health | grep "running"; then
+            echo "Server is up!"
+            break
+          fi
+          echo "Waiting for server to start..."
+          sleep 2
+        done
+        curl -X POST http://127.0.0.1:8000/train
