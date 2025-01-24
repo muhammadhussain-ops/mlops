@@ -17,7 +17,7 @@ app = FastAPI()
 
 # Load configuration
 try:
-    config = OmegaConf.load("configs/main_config.yaml")
+    config = OmegaConf.load("configs/hyp_config.yaml")
 except FileNotFoundError:
     raise RuntimeError("Configuration file not found. Ensure 'configs/main_config.yaml' exists.")
 

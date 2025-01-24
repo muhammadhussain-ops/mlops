@@ -1,0 +1,5 @@
+hyperparameters:
+ lr: 0.001
+ num_epochs: 1
+ batch_size: 32
+ small_subset: True
