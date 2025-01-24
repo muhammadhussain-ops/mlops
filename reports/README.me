@@ -143,7 +143,15 @@ s225785, s224229, s224176
 >
 > Answer:
 
-We did not use any third-party frameworks that wasnt covered in the provided materials from the course.
+TQDM:
+We used the package tqdm which visualizes the number of iterations completed in a loop. This user-friendly tool is highly beneficial when executing computationally intensive or data-heavy tasks.
+
+PIL: 
+To import and export images in different formats we used the library Pillow/PIL. This library provided a vast range of functionalities when working with images, such as processing images of different file format.
+
+ByteIO:
+The functionality of this package is a bit more technical, then that of the other packages. The BytesIO object allowed the Image.open() function to read the data as if it were a file, even though it’s actually just raw bytes in memory.
+
 
 ## Coding environment
 
@@ -163,7 +171,16 @@ We did not use any third-party frameworks that wasnt covered in the provided mat
 >
 > Answer:
 
---- question 4 fill here ---
+To manage our dependancies we created a requirements.txt file as advised in the module M2. This txt-file contained all relevent packages to execute our project. Through the use of dependabot, we made sure to that all of our packages were up to data on the GitHub workflow. 
+
+To get a complete copy of our development environment one would have to run the following commands: 
+
+“python -m pip install -U pip setuptools wheel
+          pip install -r requirements.txt
+          pip list
+          pip install -e .
+”
+
 
 ### Question 5
 
