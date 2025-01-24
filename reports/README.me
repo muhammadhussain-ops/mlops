@@ -241,7 +241,12 @@ or file in a big project.
 >
 > Answer:
 
---- question 7 fill here ---
+In this part of the project we maybe tried to be a bit too ambitious but integrating google-cloud in all off our tests,
+ instead of starting of by executing the tests locally. The unfortunately lead to the tests not being fully developed,
+  but we will try sharing our thoughts and ideas in this section. 
+
+First we wanted to evaluate the data, by testing the dimensions and number of images loaded of our data.
+Second we wanted to evaluate the model, by evaluating the accuracy of it and making sure the weights were not equal to zero.
 
 ### Question 8
 
@@ -256,7 +261,14 @@ or file in a big project.
 >
 > Answer:
 
---- question 8 fill here ---
+If the tests had been developed as expected, we would have a code coverage of around 90%. 
+The estimate is based of the size of our workflow which isn’t very large, and covering most of the code would not be that difficult. 
+Testing the connection to google cloud were not a part of the tests we wanted to develop, which makes the missing 10%.
+
+However, even if we were at 100% coverage, we would not trust the code to be error-free. This is because code coverage only
+measures the percentage of code that is executed by the tests, not the quality of the tests themselves.
+Therefore, even with 100% coverage, there could still be bugs in the code that are not caught by the tests.
+
 
 ### Question 9
 
@@ -270,6 +282,10 @@ or file in a big project.
 > *addition to the main branch. To merge code we ...*
 >
 > Answer:
+
+We made use of branches when divding the workload between us. This helped us avoid merge conflicts most of the times.
+Sometimes because of the lack of communication, two or more group members worked on the same branch which usually resulted in merge conflicts. 
+It should also be said that these conflicts were solved relatively fast.
 
 --- question 9 fill here ---
 
@@ -287,6 +303,11 @@ or file in a big project.
 > Answer:
 
 --- question 10 fill here ---
+We implemented DVC in the start of the project to store our data and for possible future version control. But this became 
+irrelevant as we instead used Google Cloud Storage for all our data and code. Furthermore we did not have different versions 
+of our data, as we only had one dataset that was used throughout the project. However, if we had multiple datasets or versions
+of the same dataset, DVC could have been used.
+
 
 ### Question 11
 
@@ -302,6 +323,12 @@ or file in a big project.
 > *here: <weblink>*
 >
 > Answer:
+
+Another consequence of the lack of structure and overly ambitious goals in the project, was that we did not implement continuous integration.
+We had planned to use GitHub actions to run the tests and linting on the code, but as referenced in the question on testing, we did not manage to implement it.
+The plan was to have a workflow that would run the tests and linting on the code whenever a push was made to the main branch. Further work would have been 
+to implement caching to speed up the workflow, but this was not implemented in the project.
+
 
 --- question 11 fill here ---
 
@@ -322,6 +349,19 @@ or file in a big project.
 >
 > Answer:
 
+We used config files that were semi-hard coded. The config files were accessed by Omegaconf and used to set the hyperparameters for the model which 
+we then would call on in the main config file when using vertex AI.
+
+example: 
+
+# hyp_config.yaml
+
+hyperparameters:
+ lr: x
+ num_epochs: x
+ batch_size: x
+ small_subset: x # this parameter was for partitioning our dataset from cloud for testing purposes.
+
 --- question 12 fill here ---
 
 ### Question 13
@@ -336,6 +376,12 @@ or file in a big project.
 > *one would have to do ...*
 >
 > Answer:
+
+We made use of config files to ensure that all hyperparameters and settings were stored and easily accessible. The config files for 
+each experiment were saved in a gcs bucket with version control. This allowed us to easily reproduce experiments by simply
+retrieving the config file from the bucket and running the experiment with the same settings. As each experiment was saved in the
+bucket's "history", we could easily track the progress of each experiment and compare the results, along with the corresponding
+hyperparameters used.
 
 --- question 13 fill here ---
 
@@ -354,6 +400,11 @@ or file in a big project.
 >
 > Answer:
 
+We were unfortunately not able to implement W&B in our project. To start with we used simple logging using print statements
+and the tqdm module to track the progress of our experiments. The plan afterwards was to further implement W&B to track the
+progress of our experiments. But due to issues we had with implementation and a lack of structured progress in the project,
+we were not able to implement better logging.
+
 --- question 14 fill here ---
 
 ### Question 15
@@ -368,6 +419,17 @@ or file in a big project.
 > *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
 >
 > Answer:
+
+Docker was used to create a containerized environment for our project. This was done with the main intention of creating images,
+which were then uploaded to the gcloud artifact registry for deployment using vertex AI. The docker images were created, tagged, and pushed using the following commands:
+
+docker build -f dockerfiles/main.dockerfile -t gcr.io/halogen-country-447611-g0/mlops-vertex-image:latest .
+docker tag gcr.io/halogen-country-447611-g0/mlops-vertex-image:latest europe-west1-docker.pkg.dev/halogen-country-447611-g0/ml-repo-224229/mlops-vertex-image:latest
+docker push europe-west1-docker.pkg.dev/halogen-country-447611-g0/ml-repo-224229/mlops-vertex-image:latest
+
+link to our main docker file:  mlops-bucket-224229-1/dockerfiles/main.dockerfile
+
+
 
 --- question 15 fill here ---
 
@@ -386,6 +448,13 @@ or file in a big project.
 
 --- question 16 fill here ---
 
+Debugging was performed using a combination of logging print statements, and then the vs code debugger. The debugger was used to
+step through the code and identify the source of the error. The print statements were used to track the progress of the code and
+give us an idea of where to set the initial breakpoints. When this was insufficient, such as when the errors were related to authentication,
+connection, or other non-locally contained issues, we used the logs from the vertex ai to identify the source of the error.
+When all else failed the errors were copied into google search or chatGPT to get a better understanding of the error and how to fix it.
+Profiling was nonexistent as the focus was on creating a final product before the deadline, and the code was not optimized for performance.
+
 ## Working in the cloud
 
 > In the following section we would like to know more about your experience when developing in the cloud.
@@ -395,6 +464,18 @@ or file in a big project.
 > **List all the GCP services that you made use of in your project and shortly explain what each service does?**
 >
 > Recommended answer length: 50-200 words.
+aiplatform.googleapis.com            Vertex AI API (used for training and deploying models)
+apigateway.googleapis.com            API Gateway API (used for creating, deploying, and managing APIs)
+artifactregistry.googleapis.com      Artifact Registry API (used for storing and managing container images and secrets)
+iam.googleapis.com                   Identity and Access Management (IAM) API (used for managing access control)
+iamcredentials.googleapis.com        IAM Service Account Credentials API (used for creating and managing service account keys and permissions)
+storage-api.googleapis.com           Google Cloud Storage JSON API (used for storing and managing data and as a place for the model to call files from)
+storage.googleapis.com               Cloud Storage API (used for storing and managing data and files)
+
+other services were of course used, for example BigQuery, cloudbuild, oslogin, source.googleapis etc... but the above-mentioned services
+were the most widely implemented services in the project.
+
+
 >
 > Example:
 > *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
@@ -416,6 +497,11 @@ or file in a big project.
 >
 > Answer:
 
+We used the compute engine in combination with vertex AI to train our model. The compute engine was used to create a virtual machine
+that was used to run the docker images that were created for the project. The VM was created with the following hardware: n1-standard-4
+(4 vCPUs, 15 GB memory). The VM was started using a custom container that was created using the dockerfiles that were created for the project.
+The VM was used to train the model and then the model was saved to the cloud storage bucket for deployment.
+
 --- question 18 fill here ---
 
 ### Question 19
@@ -434,6 +520,9 @@ or file in a big project.
 >
 > Answer:
 
+![SS of our GCP artifact registry](figures/q20.jpeg)
+
+
 --- question 20 fill here ---
 
 ### Question 21
@@ -442,6 +531,12 @@ or file in a big project.
 > **your project. You can take inspiration from [this figure](figures/build.png).**
 >
 > Answer:
+
+A short explanation for the emptiness here, we used almost exclusively the local docker build and push to the gcloud artifact registry in order to run 
+the images in the cloud. Otherwise the code was mainly run locally or through a local api for testing. The cloud build was not used as much as we had hoped.
+
+![SS of our GCP cloud build history](figures/q21.jpeg)
+
 
 --- question 21 fill here ---
 
