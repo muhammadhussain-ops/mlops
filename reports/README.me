@@ -451,7 +451,17 @@ everything is formated and distributed such that it is easy to find the desired 
 >
 > Answer:
 
---- question 23 fill here ---
+We have implemented API functionality for our program. We started by using Flask but switched to FastAPI since it was covered in
+the course material. We integrated FastAPI into the codebase, allowing a server to be started within the project. 
+When this server starts, it becomes possible to communicate with the project's main file. 
+There are three available endpoints: train, evaluate, and inference.
+The train function operates by connecting to the data folder and training the model by importing the neural network from 
+the model folder. Once trained, the model is saved back into the model folder. The evaluate function retrieves the model and 
+loads the weights from the model file, which were saved during the training process. It then evaluates the model using the entire
+dataset. The inference function takes a single data point and feeds it into the model using the weights obtained from the training 
+function.
+With this setup, users of the project do not need direct access to the various files and folders, as all interactions are 
+managed through the main file.
 
 ### Question 24
 
