@@ -477,7 +477,9 @@ managed through the main file.
 >
 > Answer:
 
---- question 24 fill here ---
+Yes, we successfully deployed our API locally using FastAPI. Initially, we considered Flask, but FastAPI was selected to align 
+with our course material. The local deployment allows users to interact with three endpoints.
+To invoke the service an user would call: http://localhost:8000/train
 
 ### Question 25
 
@@ -490,19 +492,11 @@ managed through the main file.
 > *For unit testing we used ... and for load testing we used ... . The results of the load testing showed that ...*
 > *before the service crashed.*
 >
-> Answer:
 
-We have implemented API functionality for our program by utilizing FastAPI, which was chosen over Flask because it was covered 
-in the course material. This API functionality was integrated into our local version of the project. Due to resource constraints 
-in terms of time, we were unable to implement it in our cloud solution.
-Our API provides three endpoints: train, evaluate, and inference. The train function connects to the data folder and trains the 
-model by importing the neural network from the model folder. Once training is complete, the trained model is saved back into the 
-model folder. The evaluate function retrieves the model and loads the weights from the model file, which were saved during the 
-training process. It then evaluates the model using the entire dataset. The inference function takes a single data point and feeds 
-it into the model using the weights obtained from the training function.
-With this setup, users of the project do not need direct access to the various files and folders, as all interactions are managed 
-through the main file. This streamlined approach ensures that the functionality is accessible and easy to use within the local 
-environment of the project.
+We did not implement load testing. However, if we had more time, we would have done it in the following way: 
+We would use API testing to set up simulations of possible calls to our server. From there, using the 
+Google Cloud Storage monitoring dashboard system, we would be able to see the load our project is subjected to. 
+We were considering using the Locust framework for load testing.
 
 
 
@@ -519,7 +513,12 @@ environment of the project.
 >
 > Answer:
 
---- question 26 fill here ---
+No, we did not implement monitoring of our deployed model. However, implementing monitoring would significantly enhance the 
+longevity of our application by allowing us to track the model's performance and health in real-time. Monitoring would enable 
+us to detect and address issues such as performance degradation, unexpected errors, or increased load promptly. Additionally, 
+it would provide valuable insights into usage patterns and system behavior, facilitating informed decisions for scaling and 
+optimization. By ensuring the model remains reliable and efficient, monitoring would help maintain user trust and the overall 
+effectiveness of the application over time.
 
 ## Overall discussion of project
 
