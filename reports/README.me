@@ -492,7 +492,19 @@ managed through the main file.
 >
 > Answer:
 
---- question 25 fill here ---
+We have implemented API functionality for our program by utilizing FastAPI, which was chosen over Flask because it was covered 
+in the course material. This API functionality was integrated into our local version of the project. Due to resource constraints 
+in terms of time, we were unable to implement it in our cloud solution.
+Our API provides three endpoints: train, evaluate, and inference. The train function connects to the data folder and trains the 
+model by importing the neural network from the model folder. Once training is complete, the trained model is saved back into the 
+model folder. The evaluate function retrieves the model and loads the weights from the model file, which were saved during the 
+training process. It then evaluates the model using the entire dataset. The inference function takes a single data point and feeds 
+it into the model using the weights obtained from the training function.
+With this setup, users of the project do not need direct access to the various files and folders, as all interactions are managed 
+through the main file. This streamlined approach ensures that the functionality is accessible and easy to use within the local 
+environment of the project.
+
+
 
 ### Question 26
 
